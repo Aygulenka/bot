@@ -7,7 +7,7 @@ const port = 3000;
 
 
 // Задайте URL вашего вебхука
-const webhookUrl = `https://your-domain.com/server`;
+const webhookUrl = `https://bot-xsxl.onrender.comr`;
 
 // Устанавливаем вебхук
 bot.setWebHook(webhookUrl);
