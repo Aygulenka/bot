@@ -198,10 +198,11 @@ const start = () => {
 
             default:
                 break;
+
         }
     });
     // Запланировать выполнение функции sendReminder каждый день в 19:15
-    cron.schedule('00 19 * * *', async () => {
+    cron.schedule('15 19 * * *', async () => {
         // Пройтись по всем пользователям, которые воспользовались ботом
         // и отправить им напоминание
         for (const chatId of Object.keys(messagesSentPerDay)) {
