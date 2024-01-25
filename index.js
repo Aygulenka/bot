@@ -1,4 +1,5 @@
 const TelegramApi = require('node-telegram-bot-api');
+const cron = require('node-cron');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -39,6 +40,13 @@ const options = {
         ]
     })
 };
+
+const reminderMessages = [
+    'Сегодня был трудный день, но завтра будет лучше!',
+    'Не забывай про свои цели. Ты их достигнешь!',
+    'Всегда помни, что ты не одинок. Я с тобой!',
+    // Добавьте свои сообщения
+];
 const supportMessages = [
     "Сейчас тяжело, но я верю, что нас ждет светлое будущее. Ты пройдешь через это. Поверь мне.",
     "Ты можешь не верить в себя, но знай и помни, что я верю в тебя. Я всегда верил и буду верить.",
@@ -105,6 +113,11 @@ const supportMessages = [
     " Ты такой сильный и терпеливый. Продолжай верить. Скоро все начнет налаживаться."
 
 ];
+
+const sendReminder = async (chatId) => {
+    const randomMessage = reminderMessages[Math.floor(Math.random() * reminderMessages.length)];
+    await bot.sendMessage(chatId, `Напоминание: ${randomMessage}`);
+};
 const messagesSentPerDay = {};
 const start = () => {
     bot.setMyCommands([
@@ -185,6 +198,14 @@ const start = () => {
 
             default:
                 break;
+        }
+    });
+    // Запланировать выполнение функции sendReminder каждый день в 19:15
+    cron.schedule('00 19 * * *', async () => {
+        // Пройтись по всем пользователям, которые воспользовались ботом
+        // и отправить им напоминание
+        for (const chatId of Object.keys(messagesSentPerDay)) {
+            await sendReminder(chatId);
         }
     });
 }
