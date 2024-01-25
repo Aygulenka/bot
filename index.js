@@ -8,7 +8,7 @@ const token = '6807152229:AAHiuMLO5al7EUUw1s59AP6BCoPDtQrfdAE';
 const bot = new TelegramApi(token); // Initialize the bot first
 
 // Задайте URL вашего вебхука
-const webhookUrl = 'https://2bde-92-54-204-197.ngrok-free.app';
+const webhookUrl = 'https://bot-xsxl.onrender.com';
 
 // Устанавливаем вебхук
 bot.setWebHook(webhookUrl);
