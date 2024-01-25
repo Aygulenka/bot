@@ -1,24 +1,24 @@
-
 const TelegramApi = require('node-telegram-bot-api');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
+const token = '6807152229:AAHiuMLO5al7EUUw1s59AP6BCoPDtQrfdAE';
+const bot = new TelegramApi(token); // Initialize the bot first
 
 // Задайте URL вашего вебхука
-const webhookUrl = `https://bot-xsxl.onrender.comr`;
+const webhookUrl = 'https://2bde-92-54-204-197.ngrok-free.app';
 
 // Устанавливаем вебхук
 bot.setWebHook(webhookUrl);
 
-// ... (остальной код бота)
 
 // Запуск сервера для обработки вебхуков
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post(`/your-webhook-path`, (req, res) => {
+app.post(`/`, (req, res) => {
     const body = req.body;
     bot.processUpdate(body);
     res.sendStatus(200);
@@ -28,10 +28,6 @@ app.listen(port, () => {
     console.log(`Server is listening at http://localhost:${port}`);
 });
 
-
-const token = '6807152229:AAHiuMLO5al7EUUw1s59AP6BCoPDtQrfdAE';
-
-const bot = new TelegramApi(token)
 
 
 const options = {
@@ -150,7 +146,7 @@ const start = () => {
                     messagesSentPerDay[currentDay] = 0;
                 }
 
-                if (messagesSentPerDay[currentDay] < 2) {
+                if (messagesSentPerDay[currentDay] < 6) {
                     const encouragingMessage = supportMessages[messagesSentPerDay[currentDay]];
                     await bot.sendMessage(chatId, encouragingMessage);
                     messagesSentPerDay[currentDay]++;
@@ -196,18 +192,18 @@ const start = () => {
 start();
 
 
-// Разрешаем обработку JSON и URL-encoded данных
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// // Разрешаем обработку JSON и URL-encoded данных
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
-// Роут для обработки входящих обновлений от Telegram
-app.post(`/your-webhook-path`, (req, res) => {
-    const body = req.body;
-    bot.processUpdate(body); // Передаем данные обновления боту для обработки
-    res.sendStatus(200); // Отправляем ответ Telegram, чтобы они знали, что мы получили обновление
-});
+// // Роут для обработки входящих обновлений от Telegram
+// app.post(`/your-webhook-path`, (req, res) => {
+//     const body = req.body;
+//     bot.processUpdate(body); // Передаем данные обновления боту для обработки
+//     res.sendStatus(200); // Отправляем ответ Telegram, чтобы они знали, что мы получили обновление
+// });
 
-// Запускаем сервер на указанном порту
-app.listen(port, () => {
-    console.log(`Server is listening at http://localhost:${port}`);
-});
+// // Запускаем сервер на указанном порту
+// app.listen(port, () => {
+//     console.log(`Server is listening at http://localhost:${port}`);
+// });
