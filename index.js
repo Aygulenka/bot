@@ -1,105 +1,35 @@
-// const TelegramApi = require('node-telegram-bot-api');
-
-// const token = '6807152229:AAHiuMLO5al7EUUw1s59AP6BCoPDtQrfdAE';
-
-// const bot = new TelegramApi(token, {polling:true})
-
-// const options = {
-//     reply_markup: JSON.stringify({
-//         inline_keyboard: [
-//             [{text: 'Пришли мне что-нибудь преободряющее', callback_data: 'encouraging'}],
-//             [{text: 'Мне очень грустно. Я хочу поговорить', callback_data: 'talk'}],
-//             [{text: 'Я просто хочу выговориться', callback_data: 'confide'}],
-//         ]
-//     })
-// };
-
-
-// const start = ()=>{
-//     bot.setMyCommands([
-//         {command: '/start', description:'Начальное приветствие'},
-//         {command: '/info', description:'Инофрмация'},
-//         {command: '/go', description:'Инофрмация'},
-//     ])
-//     bot.on('message', async msg=>{
-//         const text = msg.text;
-//         const chatId = msg.chat.id
-//         if(text === '/start'){
-//           await  bot.sendSticker(chatId, "https://tlgrm.ru/_/stickers/348/e30/348e3088-126b-4939-b317-e9036499c515/2.webp")
-//          return   bot.sendMessage(chatId, `Привет, дорогая ${msg.from.first_name}.`)
-//         }
-//         if(text === '/info'){
-//             return   bot.sendMessage(chatId, `Ты можешь рассчитывать на поддержку в этом чате`)
-//         }
-//         if(text === '/go'){
-//             return   bot.sendMessage(chatId, "Ты можешь рассчитывать на поддержку в этом чате", options)
-//           }
-//         //   return bot.sendMessage(chatId, `я не понимаю этой команды`)
-//     })
-
-//     // bot.on('callback_query', msg=>{
-//     //     const data = msg.data;
-//     //     const chatId = msg.message.chat.id;
-//     //     console.log(msg)
-//     //     const messageDateTimestamp = msg.message.date;
-//     //     const messageDate = new Date(messageDateTimestamp * 1000);
-        
-//     //     const dayOfMonth = messageDate.getDate();
-//     //     const month = messageDate.getMonth() + 1; // добавляем 1, чтобы получить реальный номер месяца
-        
-//     //     console.log('Число:', dayOfMonth);
-//     //     console.log('Месяц:', month);
-//     // })
-//     bot.on('callback_query', async msg => {
-//         const data = msg.data;
-//         const chatId = msg.message.chat.id;
-    
-//         switch (data) {
-//             case 'encouraging':
-//                 // Логика для преободряющего сообщения
-//                 // Используйте дату для определения, какое сообщение отправить
-//                 await bot.sendMessage(chatId, 'Преободряющее сообщение');
-//                 break;
-    
-//             case 'talk':
-//                 // Логика для случая, когда пользователь хочет поговорить
-//                 const talkOptions = {
-//                     reply_markup: JSON.stringify({
-//                         inline_keyboard: [
-//                             [{text: 'С живым', callback_data: 'live'}, {text: 'С тобой', callback_data: 'with_you'}]
-//                         ]
-//                     })
-//                 };
-//                 await bot.sendMessage(chatId, 'Что случилось? Ты хочешь с кем-нибудь живым поговорить или со мной?', talkOptions);
-//                 break;
-    
-//             case 'live':
-//                 // Логика для случая, когда пользователь выбирает "С живым"
-//                 await bot.sendMessage(chatId, 'Милка на телеграм @aygulenka94');
-//                 break;
-    
-//             case 'with_you':
-//                 // Логика для случая, когда пользователь выбирает "С тобой"
-//                 await bot.sendMessage(chatId, 'Я готов тебя слушать');
-//                 break;
-    
-//             case 'confide':
-//                 // Логика для случая, когда пользователь хочет выговориться
-//                 await bot.sendMessage(chatId, 'Говори, все останется между нами');
-//                 break;
-    
-//             default:
-//                 break;
-//         }
-//     });
-
-// }
-// start()
 const TelegramApi = require('node-telegram-bot-api');
+const cron = require('node-cron');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
 
 const token = '6807152229:AAHiuMLO5al7EUUw1s59AP6BCoPDtQrfdAE';
+const bot = new TelegramApi(token); // Initialize the bot first
 
-const bot = new TelegramApi(token, {polling:true})
+// Задайте URL вашего вебхука
+const webhookUrl = 'https://bot-pi-hazel.vercel.app/';
+
+// Устанавливаем вебхук
+bot.setWebHook(webhookUrl);
+
+
+// Запуск сервера для обработки вебхуков
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post(`/`, (req, res) => {
+    const body = req.body;
+    bot.processUpdate(body);
+    res.sendStatus(200);
+});
+
+app.listen(port, () => {
+    console.log(`Server is listening at http://localhost:${port}`);
+});
+
+
 
 const options = {
     reply_markup: JSON.stringify({
@@ -110,6 +40,13 @@ const options = {
         ]
     })
 };
+
+const reminderMessages = [
+    'Сегодня был трудный день, но завтра будет лучше!',
+    'Не забывай про свои цели. Ты их достигнешь!',
+    'Всегда помни, что ты не одинок. Я с тобой!',
+    // Добавьте свои сообщения
+];
 const supportMessages = [
     "Сейчас тяжело, но я верю, что нас ждет светлое будущее. Ты пройдешь через это. Поверь мне.",
     "Ты можешь не верить в себя, но знай и помни, что я верю в тебя. Я всегда верил и буду верить.",
@@ -176,6 +113,11 @@ const supportMessages = [
     " Ты такой сильный и терпеливый. Продолжай верить. Скоро все начнет налаживаться."
 
 ];
+
+const sendReminder = async (chatId) => {
+    const randomMessage = reminderMessages[Math.floor(Math.random() * reminderMessages.length)];
+    await bot.sendMessage(chatId, `Напоминание: ${randomMessage}`);
+};
 const messagesSentPerDay = {};
 const start = () => {
     bot.setMyCommands([
@@ -217,7 +159,7 @@ const start = () => {
                     messagesSentPerDay[currentDay] = 0;
                 }
 
-                if (messagesSentPerDay[currentDay] < 2) {
+                if (messagesSentPerDay[currentDay] < 6) {
                     const encouragingMessage = supportMessages[messagesSentPerDay[currentDay]];
                     await bot.sendMessage(chatId, encouragingMessage);
                     messagesSentPerDay[currentDay]++;
@@ -256,8 +198,34 @@ const start = () => {
 
             default:
                 break;
+
+        }
+    });
+    // Запланировать выполнение функции sendReminder каждый день в 19:15
+    cron.schedule('15 19 * * *', async () => {
+        // Пройтись по всем пользователям, которые воспользовались ботом
+        // и отправить им напоминание
+        for (const chatId of Object.keys(messagesSentPerDay)) {
+            await sendReminder(chatId);
         }
     });
 }
 
 start();
+
+
+// // Разрешаем обработку JSON и URL-encoded данных
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+
+// // Роут для обработки входящих обновлений от Telegram
+// app.post(`/your-webhook-path`, (req, res) => {
+//     const body = req.body;
+//     bot.processUpdate(body); // Передаем данные обновления боту для обработки
+//     res.sendStatus(200); // Отправляем ответ Telegram, чтобы они знали, что мы получили обновление
+// });
+
+// // Запускаем сервер на указанном порту
+// app.listen(port, () => {
+//     console.log(`Server is listening at http://localhost:${port}`);
+// });
